@@ -1,0 +1,13 @@
+---
+title: "Short Report 2 Code"
+author: "Anna Ursin and Kunwu Lyu"
+date: "`r Sys.Date()`"
+output: pdf_document
+---
+
+```{r}
+## Data Wrangling
+
+
+```
+
