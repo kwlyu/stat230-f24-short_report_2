@@ -12,6 +12,7 @@ library(GGally)
 library(broom)
 library(patchwork)
 library(purrr)
+
 ```
 
 
@@ -19,15 +20,29 @@ library(purrr)
 ## Data Wrangling
 
 wine_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/wine_project.csv")
-
-fire_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/forestfires.csv")
+glimpse(wine_dat)
 
 
 ggpairs(wine_dat)
 ```
 
 ```{r}
-## test
+##EDA: boxplots
+library(ggplot2)
+ggplot(wine_dat, aes(y = fixed.acidity)) + geom_boxplot() + ggtitle("Fixed Acidity")
+ggplot(wine_dat, aes(y = volatile.acidity)) + geom_boxplot() + ggtitle("Volatile Acidity")
+ggplot(wine_dat, aes(y = citric.acid)) + geom_boxplot() + ggtitle("Citric Acid")
+ggplot(wine_dat, aes(y = residual.sugar)) + geom_boxplot() + ggtitle("Residual Sugar")
+ggplot(wine_dat, aes(y = chlorides)) + geom_boxplot() + ggtitle("Chlorides")
+ggplot(wine_dat, aes(y = free.sulfur.dioxide)) + geom_boxplot() + ggtitle("Free Sulfur Dioxide")
+ggplot(wine_dat, aes(y = total.sulfur.dioxide)) + geom_boxplot() + ggtitle("Total Sulfur Dioxide")
+ggplot(wine_dat, aes(y = density)) + geom_boxplot() + ggtitle("Density")
+ggplot(wine_dat, aes(y = pH)) + geom_boxplot() + ggtitle("pH")
+ggplot(wine_dat, aes(y = sulphates)) + geom_boxplot() + ggtitle("Sulphates")
+ggplot(wine_dat, aes(y = alcohol)) + geom_boxplot() + ggtitle("Alcohol")
+ggplot(wine_dat, aes(y = quality)) + geom_boxplot() + ggtitle("Quality")
+ggplot(wine_dat, aes(x = color, fill = color)) +
+  geom_bar(position = "dodge")
 ```
 
 
