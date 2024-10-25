@@ -4,10 +4,25 @@ author: "Anna Ursin and Kunwu Lyu"
 date: "`r Sys.Date()`"
 output: pdf_document
 ---
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(ggplot2)
+library(GGally)
+library(broom)
+library(patchwork)
+library(purrr)
+```
+
 
 ```{r}
 ## Data Wrangling
 
+wine_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/wine_project.csv")
 
+fire_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/forestfires.csv")
+
+
+ggpairs(wine_dat)
 ```
 
