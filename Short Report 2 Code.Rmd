@@ -26,3 +26,7 @@ fire_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/forestfires.cs
 ggpairs(wine_dat)
 ```
 
+```{r}
+## test
+```
+
