@@ -37,5 +37,16 @@ ggpairs(wine_dat)
 
 ```{r}
 # I'll add something
+for (i in length(ls(wine_dat))) {
+  ggplot(wine_dat, aes(x = ls(wine_dat)[i], y = quality)) + 
+  geom_point()+
+  facet_grid(cols = vars(color)) + 
+  geom_smooth(method = "lm", se = F)
+}
+
+ggplot(wine_dat, aes(x = alcohol, y = quality)) + 
+  geom_point()+
+  facet_grid(cols = vars(color)) + 
+  geom_smooth(method = "lm", se = F)
 ```
 
