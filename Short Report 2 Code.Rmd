@@ -53,6 +53,7 @@ ggplot(wine_dat, aes(x = quality)) +
 ```{r}
 #correlation matrix
 library(corrplot)
+wine_numeric <- wine_dat %>% select(-color)
 corr_matrix <- cor(wine_numeric, use = "complete.obs")
 corrplot(corr_matrix, method = "color")
 ```
