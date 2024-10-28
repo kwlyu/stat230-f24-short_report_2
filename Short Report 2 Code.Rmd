@@ -60,11 +60,14 @@ wine_numeric <- wine_dat %>% select(-color)
 
 corr_matrix <- cor(wine_numeric, use = "complete.obs")
 corrplot(corr_matrix, method = "color")
+
+#checking for VIF - must use base model, not interaction model
+vif(wine_lmbase)
 ```
 
 ```{r}
 # Scatterplot matrix
-ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "color", "quality"))
+ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "quality"))
 
 create_plot <- function(var_name) {
   ggplot(data = wine_dat, 
@@ -80,6 +83,25 @@ plot_list <- map(variable_names, create_plot)
 plot_grid <- wrap_plots(plot_list, ncol = 2)
 plot_grid
 ```
+```{r}
+#figuring out outliers based on scatterplot matrix
+mean_values <- wine_dat %>%
+  summarize(across(c(alcohol, sulphates, pH, residual.sugar, citric.acid, fixed.acidity), mean, na.rm = TRUE))
+mean_values
+
+row_num <- 4381
+case_values <- wine_dat[row_num, c("alcohol", "sulphates", "pH", "residual.sugar", "citric.acid", "fixed.acidity")]
+case_values
+#This case has a very large residual sugar
+```
+```{r}
+wine_dat_no_outliers <- wine_dat %>%
+  filter(residual.sugar != 65.8)
+winenooutlierslm <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat_no_outliers)
+summary(winenooutlierslm)
+```
+
+
 
 ```{r}
 #Basefunction
@@ -87,6 +109,7 @@ wine_lmbase <- lm(quality ~ alcohol + sulphates + residual.sugar + pH, data = wi
 summary(wine_lmbase)
 wine_lminteraction <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
 summary(wine_lminteraction)
+confint(wine_lminteraction)
 ```
 
 ```{r}
@@ -132,7 +155,20 @@ high_CD
 
 ```{r}
 #model comparison
-
 anova(wine_lmbase, wine_lminteraction)
+```
+
+```{r}
+#backwards selection
+
+upper_model <- lm(quality ~ (pH + alcohol + residual.sugar + color + sulphates + fixed.acidity + volatile.acidity + citric.acid + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density)^2,
+                 data = wine_dat)
+lower_model <- lm(quality ~ 1, data = wine_dat)
+
+library(MASS)
+backwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model, 
+                                                         upper = upper_model),
+                               direction = "backward")
+summary(backwardSelectModel)
 ```
 
