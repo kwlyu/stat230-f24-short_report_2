@@ -5,7 +5,7 @@ date: "`r Sys.Date()`"
 output: pdf_document
 ---
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = TRUE, cache = T)
 library(tidyverse)
 library(ggplot2)
 library(GGally)
@@ -58,6 +58,28 @@ corrplot(corr_matrix, method = "color")
 ```
 
 ```{r}
-# I'll add something
+# Scatterplot matrix
+ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "color", "quality"))
+
+create_plot <- function(var_name) {
+  ggplot(data = wine_dat, 
+         aes_string(x = var_name, y = "quality", color = "color")) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE) + 
+    labs(title = paste("Quality vs", var_name))
+}
+
+variable_names <- c("alcohol", "sulphates", "pH", "residual.sugar")
+plot_list <- map(variable_names, create_plot)
+
+plot_grid <- wrap_plots(plot_list, ncol = 2)
+plot_grid
+
+wine_lm_base <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
+
+summary(wine_lm_base)
+
+
+
 ```
 
