@@ -11,7 +11,6 @@ library(ggplot2)
 library(GGally)
 library(broom)
 library(patchwork)
-library(ggResidpanel)
 library(purrr)
 ```
 
@@ -80,14 +79,6 @@ plot_list <- map(variable_names, create_plot)
 
 plot_grid <- wrap_plots(plot_list, ncol = 2)
 plot_grid
-
-wine_lm_base <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
-
-summary(wine_lm_base)
-
-
-resid_xpanel(wine_lm_base)
-resid_panel(wine_lm_base)
 ```
 
 ```{r}
@@ -118,4 +109,9 @@ high_SR
 high_CD
 ```
 
+```{r}
+#model comparison
+
+anova(wine_lmbase, wine_lminteraction)
+```
 
