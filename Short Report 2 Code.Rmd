@@ -91,18 +91,39 @@ summary(wine_lminteraction)
 
 ```{r}
 #checking for influential observations
-
-
-
-ggplot(AUGwine_lminteraction, aes(x = 1:nrow(AUGwine_lminteraction), y = .cooksd)) + geom_point() + 
-  labs(y = "Cook's Distance", x = "Index")
-
 wine_datrow <- wine_dat %>% mutate(case = row_number())
 AUGwine_lminteraction <- augment(wine_lminteraction, data = wine_datrow)
 
-high_L <- AUGwine_lminteraction %>% arrange(desc(.hat)) %>% head()
-high_SR <- AUGwine_lminteraction %>% arrange(desc(.std.resid)) %>% head()
-high_CD <- AUGwine_lminteraction %>% arrange(desc(.cooksd)) %>% head()
+
+ggplot(data = AUGwine_lminteraction, aes(x = case, y = .cooksd)) + 
+  geom_point() + 
+  geom_point(data = AUGwine_lminteraction %>% filter(case == 4381), color = "blue") + 
+  geom_hline(yintercept=1, linetype="dashed", color = "red")  + 
+  labs(y = "Cook's Distance", x = "Index") -> cookDistancePlot
+
+
+ggplot(AUGwine_lminteraction, aes(x = case, y = .std.resid)) + geom_point() + 
+  geom_point(data = AUGwine_lminteraction %>% filter(case == 4381), color = "blue") + 
+  geom_hline(yintercept=3, linetype="dashed", color = "red")  + 
+  geom_hline(yintercept=-3, linetype="dashed", color = "red")  + 
+  labs(y = "Studentized Residuals", x = "Index") -> studResiPlot
+
+ggplot(AUGwine_lminteraction, aes(x = case, y = .hat)) + geom_point() + 
+  geom_point(data = AUGwine_lminteraction %>% filter(case == 4381), color = "blue") + 
+  geom_hline(yintercept=2*7/6497, linetype="dashed", color = "red")  + 
+  labs(y = "Leverage", x = "Index") -> leveragePlot
+
+cookDistancePlot|studResiPlot|leveragePlot 
+
+high_L <- AUGwine_lminteraction %>% select(case, .hat) %>% 
+  arrange(desc(.hat)) %>%
+  filter(.hat > 2*7/6497)
+high_SR <- AUGwine_lminteraction %>% select(case, .std.resid) %>% 
+  arrange(desc(.std.resid)) %>% 
+  filter(.std.resid > 3)
+high_CD <- AUGwine_lminteraction %>% select(case, .cooksd) %>% 
+  arrange(desc(.cooksd)) %>% 
+  filter(.cooksd > 1)
 high_L
 high_SR
 #case 2374 is high, above 4
