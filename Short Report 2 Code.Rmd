@@ -12,7 +12,6 @@ library(GGally)
 library(broom)
 library(patchwork)
 library(purrr)
-
 ```
 
 
@@ -44,10 +43,18 @@ ggplot(wine_dat, aes(y = quality)) + geom_boxplot() + ggtitle("Quality")
 ggplot(wine_dat, aes(x = color, fill = color)) +
   geom_bar(position = "dodge")
 ```
-
+```{r}
+#dist of quality scores
+ggplot(wine_dat, aes(x = quality)) + 
+  geom_bar() + 
+  labs(title = "Distribution of Wine Quality Scores")
+```
 
 ```{r}
-#number 2
+#correlation matrix
+library(corrplot)
+corr_matrix <- cor(wine_numeric, use = "complete.obs")
+corrplot(corr_matrix, method = "color")
 ```
 
 ```{r}
