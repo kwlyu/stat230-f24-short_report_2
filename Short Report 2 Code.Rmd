@@ -44,6 +44,8 @@ ggplot(wine_dat, aes(y = quality)) + geom_boxplot() + ggtitle("Quality")
 ggplot(wine_dat, aes(x = color, fill = color)) +
   geom_bar(position = "dodge")
 ```
+
+
 ```{r}
 #dist of quality scores
 ggplot(wine_dat, aes(x = quality)) + 
@@ -54,7 +56,9 @@ ggplot(wine_dat, aes(x = quality)) +
 ```{r}
 #correlation matrix
 library(corrplot)
+
 wine_numeric <- wine_dat %>% select(-color)
+
 corr_matrix <- cor(wine_numeric, use = "complete.obs")
 corrplot(corr_matrix, method = "color")
 ```
@@ -85,4 +89,33 @@ summary(wine_lm_base)
 resid_xpanel(wine_lm_base)
 resid_panel(wine_lm_base)
 ```
+
+```{r}
+#Basefunction
+wine_lmbase <- lm(quality ~ alcohol + sulphates + residual.sugar + pH, data = wine_dat)
+summary(wine_lmbase)
+wine_lminteraction <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
+summary(wine_lminteraction)
+```
+
+```{r}
+#checking for influential observations
+
+
+
+ggplot(AUGwine_lminteraction, aes(x = 1:nrow(AUGwine_lminteraction), y = .cooksd)) + geom_point() + 
+  labs(y = "Cook's Distance", x = "Index")
+
+wine_datrow <- wine_dat %>% mutate(case = row_number())
+AUGwine_lminteraction <- augment(wine_lminteraction, data = wine_datrow)
+
+high_L <- AUGwine_lminteraction %>% arrange(desc(.hat)) %>% head()
+high_SR <- AUGwine_lminteraction %>% arrange(desc(.std.resid)) %>% head()
+high_CD <- AUGwine_lminteraction %>% arrange(desc(.cooksd)) %>% head()
+high_L
+high_SR
+#case 2374 is high, above 4
+high_CD
+```
+
 
