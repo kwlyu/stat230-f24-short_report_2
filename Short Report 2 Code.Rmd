@@ -11,6 +11,7 @@ library(ggplot2)
 library(GGally)
 library(broom)
 library(patchwork)
+library(ggResidpanel)
 library(purrr)
 ```
 
@@ -81,6 +82,7 @@ wine_lm_base <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, da
 summary(wine_lm_base)
 
 
-
+resid_xpanel(wine_lm_base)
+resid_panel(wine_lm_base)
 ```
 
