@@ -154,7 +154,7 @@ high_CD
 
 ```{r}
 #model comparison
-anova(wine_lmbase, wine_lminteraction)
+anova(wine_lmbase, interactionmodel)
 ```
 
 ```{r}
@@ -169,5 +169,15 @@ backwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model,
                                                          upper = upper_model),
                                direction = "backward")
 summary(backwardSelectModel)
+
+anova(interactionmodel, backwardSelectModel)
+```
+```{r}
+#Residual Plots
+library(ggResidpanel)
+resid_panel(MRmodel, plots = c("hist", "qq"))
+resid_panel(interactionmodel, plots = "resid", smoother = TRUE)
+resid_xpanel(interactionmodel, smoother = TRUE)
+
 ```
 
