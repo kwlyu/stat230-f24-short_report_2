@@ -72,8 +72,7 @@ ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sug
 create_plot <- function(var_name) {
   ggplot(data = wine_dat, 
          aes_string(x = var_name, y = "quality", color = "color")) +
-    geom_point() +
-    geom_jitter()+
+    geom_point(alpha = 0.1) +
     geom_smooth(method = "lm", se = FALSE) + 
     labs(title = paste("Quality vs", var_name))
 }
