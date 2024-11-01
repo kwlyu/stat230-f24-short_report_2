@@ -114,6 +114,23 @@ confint(wine_lminteraction)
 ```
 
 ```{r}
+# linear comb for white wine ph
+wine_lminteraction$coefficients[5] -> redPH
+wine_lminteraction$coefficients[7] -> whtPH_int
+
+whtPH <- (redPH + whtPH_int)[[1]]
+
+vcov(wine_lminteraction)[c(5, 7), c(5, 7)] -> ph_cov
+
+ph_se <- sqrt(ph_cov[[1, 1]] + ph_cov[[2, 2]] + 2 * ph_cov[[1, 2]])
+
+test_stat <- whtPH/ph_se
+2*pt(test_stat, df = 6497 - 7, lower.tail = F)
+```
+
+
+
+```{r}
 #checking for influential observations
 wine_datrow <- wine_dat %>% mutate(case = row_number())
 AUGwine_lminteraction <- augment(wine_lminteraction, data = wine_datrow)
