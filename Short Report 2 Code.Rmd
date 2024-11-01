@@ -100,6 +100,23 @@ wine_dat_no_outliers <- wine_dat %>%
   filter(residual.sugar != 65.8)
 winenooutlierslm <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat_no_outliers)
 summary(winenooutlierslm)
+
+create_inf_plot <- function(var_name) {
+  ggplot(data = wine_dat, 
+         aes_string(x = var_name, y = "quality")) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    geom_point(data = wine_dat %>% filter(residual.sugar == 65.8), 
+               color = "red") +
+    geom_smooth(data = wine_dat %>% filter(residual.sugar == 65.8), 
+                method = "lm", se = FALSE, color = "red") +
+    labs(title = paste("Plot of Quality vs", var_name))
+}
+
+plot_list2 <- map(variable_names, create_inf_plot)
+
+plot_grid2 <- wrap_plots(plot_list2, ncol = 2)
+plot_grid2
 ```
 
 
