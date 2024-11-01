@@ -12,6 +12,7 @@ library(GGally)
 library(broom)
 library(patchwork)
 library(purrr)
+library(car)
 ```
 
 
@@ -50,13 +51,11 @@ ggplot(wine_dat, aes(x = color, fill = color)) +
 ggplot(wine_dat, aes(x = quality)) + 
   geom_bar() + 
   labs(title = "Distribution of Wine Quality Scores")
-ggplot(wine_dat, aes(y = residual.sugar)) + geom_boxplot() + ggtitle("Residual Sugar")
 ```
 
 ```{r}
 #correlation matrix
 library(corrplot)
-library(car)
 
 wine_numeric <- wine_dat %>% select(-color)
 
@@ -68,20 +67,13 @@ vif(wine_lmbase)
 ```
 
 ```{r}
-#Basefunction
-wine_lmbase <- lm(quality ~ alcohol + sulphates + residual.sugar + pH, data = wine_dat)
-summary(wine_lmbase)
-```
-
-
-```{r}
 # Scatterplot matrix
 ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "quality"))
 
 create_plot <- function(var_name) {
   ggplot(data = wine_dat, 
          aes_string(x = var_name, y = "quality", color = "color")) +
-    geom_point() +
+    geom_point(alpha = 0.1) +
     geom_smooth(method = "lm", se = FALSE) + 
     labs(title = paste("Quality vs", var_name))
 }
@@ -104,10 +96,60 @@ case_values
 #This case has a very large residual sugar
 ```
 ```{r}
+
 #making an interaction model
 interactionmodel <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
 summary(interactionmodel)
 confint(interactionmodel)
+
+wine_dat_no_outliers <- wine_dat %>%
+  filter(residual.sugar != 65.8)
+winenooutlierslm <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat_no_outliers)
+summary(winenooutlierslm)
+
+create_inf_plot <- function(var_name) {
+  ggplot(data = wine_dat, 
+         aes_string(x = var_name, y = "quality")) +
+    geom_point() +
+    geom_smooth(method = "lm", se = FALSE, color = "blue") +
+    geom_point(data = wine_dat %>% filter(residual.sugar == 65.8), 
+               color = "red") +
+    geom_smooth(data = wine_dat %>% filter(residual.sugar == 65.8), 
+                method = "lm", se = FALSE, color = "red") +
+    labs(title = paste("Plot of Quality vs", var_name))
+}
+
+plot_list2 <- map(variable_names, create_inf_plot)
+
+plot_grid2 <- wrap_plots(plot_list2, ncol = 2)
+plot_grid2
+```
+
+
+
+```{r}
+#Basefunction
+wine_lmbase <- lm(quality ~ alcohol + sulphates + residual.sugar + pH, data = wine_dat)
+summary(wine_lmbase)
+wine_lminteraction <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
+summary(wine_lminteraction)
+confint(wine_lminteraction)
+```
+
+```{r}
+# linear comb for white wine ph
+wine_lminteraction$coefficients[5] -> redPH
+wine_lminteraction$coefficients[7] -> whtPH_int
+
+whtPH <- (redPH + whtPH_int)[[1]]
+
+vcov(wine_lminteraction)[c(5, 7), c(5, 7)] -> ph_cov
+
+ph_se <- sqrt(ph_cov[[1, 1]] + ph_cov[[2, 2]] + 2 * ph_cov[[1, 2]])
+
+test_stat <- whtPH/ph_se
+2*pt(test_stat, df = 6497 - 7, lower.tail = F)
+
 ```
 
 
@@ -167,6 +209,7 @@ AICinteraction
 
 
 ```{r}
+set.seed(67393937)
 #backwards selection
 
 upper_model <- lm(quality ~ (pH + alcohol + residual.sugar + color + sulphates + fixed.acidity + volatile.acidity + citric.acid + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density)^2,
@@ -179,14 +222,22 @@ backwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model,
                                direction = "backward")
 summary(backwardSelectModel)
 
-anova(interactionmodel, backwardSelectModel)
+forwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model, 
+                                                         upper = upper_model),
+                               direction = "forward")
+summary(forwardSelectModel)
+
+anova(wine_lminteraction, forwardSelectModel)
+anova(wine_lminteraction, backwardSelectModel)
 ```
+
 ```{r}
 #Residual Plots
 library(ggResidpanel)
-resid_panel(MRmodel, plots = c("hist", "qq"))
-resid_panel(interactionmodel, plots = "resid", smoother = TRUE)
-resid_xpanel(interactionmodel, smoother = TRUE)
+resid_panel(wine_lminteraction, plots = c("hist", "qq", "resid"), smoother = T)
+resid_panel(wine_lminteraction, plots = "resid", smoother = TRUE)
+resid_xpanel(wine_lminteraction, smoother = TRUE)
 
 ```
+
 
