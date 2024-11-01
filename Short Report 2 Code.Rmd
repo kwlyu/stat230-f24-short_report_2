@@ -128,7 +128,7 @@ ggplot(data = AUGwine_lminteraction, aes(x = case, y = .cooksd)) +
 
 ggplot(AUGwine_lminteraction, aes(x = case, y = .std.resid)) + geom_point() + 
   geom_point(data = AUGwine_lminteraction %>% filter(case == 4381), color = "blue") + 
-  geom_hline(yintercept=3, linetype="dashed", coslor = "red")  + 
+  geom_hline(yintercept=3, linetype="dashed", color = "red")  + 
   geom_hline(yintercept=-3, linetype="dashed", color = "red")  + 
   labs(y = "Studentized Residuals", x = "Index") -> studResiPlot
 
@@ -160,6 +160,7 @@ anova(wine_lmbase, interactionmodel)
 ```
 
 ```{r}
+set.seed(67393937)
 #backwards selection
 
 upper_model <- lm(quality ~ (pH + alcohol + residual.sugar + color + sulphates + fixed.acidity + volatile.acidity + citric.acid + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density)^2,
@@ -172,14 +173,21 @@ backwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model,
                                direction = "backward")
 summary(backwardSelectModel)
 
-anova(interactionmodel, backwardSelectModel)
+forwardSelectModel <- stepAIC(upper_model, scope = list(lower = lower_model, 
+                                                         upper = upper_model),
+                               direction = "forward")
+summary(forwardSelectModel)
+
+anova(wine_lminteraction, forwardSelectModel)
+anova(wine_lminteraction, backwardSelectModel)
 ```
+
 ```{r}
 #Residual Plots
 library(ggResidpanel)
-resid_panel(MRmodel, plots = c("hist", "qq"))
-resid_panel(interactionmodel, plots = "resid", smoother = TRUE)
-resid_xpanel(interactionmodel, smoother = TRUE)
+resid_panel(wine_lminteraction, plots = c("hist", "qq", "resid"), smoother = T)
+resid_panel(wine_lminteraction, plots = "resid", smoother = TRUE)
+resid_xpanel(wine_lminteraction, smoother = TRUE)
 
 ```
 
