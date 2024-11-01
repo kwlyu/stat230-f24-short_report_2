@@ -12,6 +12,7 @@ library(GGally)
 library(broom)
 library(patchwork)
 library(purrr)
+library(car)
 ```
 
 
