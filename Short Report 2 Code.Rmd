@@ -104,6 +104,7 @@ case_values
 #This case has a very large residual sugar
 ```
 ```{r}
+#making an interaction model
 interactionmodel <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
 summary(interactionmodel)
 confint(interactionmodel)
@@ -156,6 +157,14 @@ high_CD
 #model comparison
 anova(wine_lmbase, interactionmodel)
 ```
+```{r}
+#model comparison using AIC
+AICbase <- AIC(wine_lmbase)
+AICinteraction <- AIC(interactionmodel)
+AICbase
+AICinteraction
+```
+
 
 ```{r}
 #backwards selection
