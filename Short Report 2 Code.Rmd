@@ -67,6 +67,17 @@ vif(wine_lmbase)
 ```
 
 ```{r}
+#residual plots by color
+ggplot(data = data.frame(Residuals = residuals(interactionmodel), Color = wine_dat$color), 
+       aes(x = Color, y = Residuals, fill = Color)) +
+  geom_boxplot() +
+  geom_hline(yintercept = 0, color = "red", linetype = "dashed") +
+  labs(title = "Residuals by Wine Color", x = "Wine Color", y = "Residuals") +
+  theme_minimal()
+```
+
+
+```{r}
 # Scatterplot matrix
 ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "quality"))
 
@@ -84,6 +95,7 @@ plot_list <- map(variable_names, create_plot)
 plot_grid <- wrap_plots(plot_list, ncol = 2)
 plot_grid
 ```
+
 ```{r}
 #figuring out outliers based on scatterplot matrix
 mean_values <- wine_dat %>%
@@ -95,6 +107,7 @@ case_values <- wine_dat[row_num, c("alcohol", "sulphates", "pH", "residual.sugar
 case_values
 #This case has a very large residual sugar
 ```
+
 ```{r}
 
 #making an interaction model
@@ -200,12 +213,13 @@ high_CD
 
 ```{r}
 #model comparison
-anova(wine_lmbase, interactionmodel)
+anova(wine_lmbase, wine_lminteraction)
 ```
+
 ```{r}
 #model comparison using AIC
 AICbase <- AIC(wine_lmbase)
-AICinteraction <- AIC(interactionmodel)
+AICinteraction <- AIC(wine_lminteraction)
 AICbase
 AICinteraction
 ```
