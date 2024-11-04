@@ -65,6 +65,7 @@ corrplot(corr_matrix, method = "color")
 
 #checking for VIF - must use base model, not interaction model
 vif(wine_lmbase)
+vif(lm(quality ~ alcohol + sulphates + residual.sugar + pH + color, data = wine_dat)) # I think it should be this one; the base model doesn't have a color term
 ```
 
 ```{r}
@@ -306,9 +307,9 @@ create_res_plot <- function(data) {
   
   # normal qq plot
   wine_lm_qq <- ggplot(wine_lm_aug, aes(sample = .resid))+
-  geom_qq() +
-  geom_qq_line(color = "blue") +
-  labs(y = "Sample Quantiles", x = "Normal Quantiles")
+    geom_qq() +
+    geom_qq_line(color = "blue") +
+    labs(y = "Sample Quantiles", x = "Normal Quantiles")
   
   combined_plot <- (wine_lm_res1 | wine_lm_res2 | wine_lm_res3) / (wine_lm_res4 | wine_lm_res5 | wine_lm_res6) / wine_lm_qq
   combined_plot + 
@@ -325,7 +326,7 @@ create_res_plot(wine_lminteraction)
 
 wine_lminteraction_tran <- lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH*color, data = wine_dat)
 summary(wine_lminteraction_tran)
-
+AIC(wine_lminteraction_tran)
 create_res_plot(wine_lminteraction_tran)
 ```
 
