@@ -265,9 +265,13 @@ create_res_plot <- function(data) {
   if (identical(data, wine_lminteraction_tran)) {
     wine_lm_aug$var_sul <- log(wine_lm_aug$sulphates)
     wine_lm_aug$var_sug <- log(wine_lm_aug$residual.sugar)
+    sul_name <- "Log(Sulphates)"
+    sug_name <- "Log(Residual Sugar)"
   } else {
     wine_lm_aug$var_sul <- wine_lm_aug$sulphates
     wine_lm_aug$var_sug <- wine_lm_aug$residual.sugar
+    sul_name <- "Sulphates"
+    sug_name <- "Residual Sugar"
   }
   # residual plot
   wine_lm_res1 <- ggplot(wine_lm_aug, aes(x = alcohol, y = .resid)) + 
@@ -280,13 +284,13 @@ create_res_plot <- function(data) {
     geom_point(alpha = 0.3) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
     geom_smooth(method = "loess", color = "red") +
-    labs(x = "Log(Sulphates)", y = "residuals")
+    labs(x = sul_name, y = "residuals")
   
   wine_lm_res3 <- ggplot(wine_lm_aug, aes(x = var_sug, y = .resid)) + 
     geom_point(alpha = 0.3) +
     geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
     geom_smooth(method = "loess", color = "red") +
-    labs(x = "Log(Residual Sugar)", y = "residuals")
+    labs(x = sug_name, y = "residuals")
   
   wine_lm_res4 <- ggplot(wine_lm_aug, aes(x = pH, y = .resid)) + 
     geom_point(alpha = 0.3) +
