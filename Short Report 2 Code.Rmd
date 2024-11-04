@@ -24,7 +24,9 @@ library(MASS)
 wine_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/wine_project.csv")
 glimpse(wine_dat)
 ggpairs(wine_dat) # for all
-ggpairs(data = wine_dat, columns = c("alcohol", "sulphates", "pH", "residual.sugar", "quality")) # for interested vars
+ggpairs(data = wine_dat, columns = 
+          c("alcohol", "sulphates", "pH", 
+            "residual.sugar", "quality")) # for interested vars
 
 ## dist of quality scores
 ggplot(wine_dat, aes(x = quality)) + 
@@ -32,6 +34,7 @@ ggplot(wine_dat, aes(x = quality)) +
   facet_grid(cols = vars(color))
   labs(title = "Distribution of Wine Quality Scores")
 ```
+
 
 ## EDA Plot
 ```{r Scat. Plot by Clr, cache=TRUE}
@@ -66,7 +69,8 @@ wine_lm_base <- lm(quality ~ alcohol + sulphates + residual.sugar + pH, data = w
 summary(wine_lm_base)
 
 ## Interaction Model
-wine_lm_interaction <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
+wine_lm_interaction <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, 
+                          data = wine_dat)
 summary(wine_lm_interaction)
 ```
 
@@ -159,16 +163,17 @@ wine_lm_res3 <- ggplot(wine_lm_aug, aes(x = residual.sugar, y = .resid)) +
   geom_smooth(method = "loess", color = "red") +
   labs(x = "Residual Sugar", y = "residuals")
 combined_plot <- (wine_lm_res2 | wine_lm_res3) 
-  combined_plot + 
-    plot_layout(guides = 'collect') + 
-    plot_annotation(title = "Selected Residual Plot of Wine Quality MLR")
-combined_plot
+combined_plot + 
+  plot_layout(guides = 'collect') + 
+  plot_annotation(title = "Selected Residual Plot of Wine Quality MLR")
 ```
 
 
 ```{r Trasformed Model and Residuals, cache=TRUE}
 ## transformed model
-wine_lm_interaction_tran <- lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH*color, data = wine_dat)
+wine_lm_interaction_tran <- lm(quality ~ alcohol + 
+                                 log(sulphates) + log(residual.sugar) + 
+                                 pH*color, data = wine_dat)
 summary(wine_lm_interaction_tran)
 
 ## residual plots
@@ -232,22 +237,25 @@ wine_lm_interaction_tran$coefficients[4] * log(2)
 ```{r VIF, cache=TRUE}
 #checking for VIF - must use base model, not interaction model
 vif(wine_lm_base)
-vif(lm(quality ~ alcohol + sulphates + residual.sugar + pH + color, data = wine_dat)) # Might be this one; the base model doesn't have a color term
-vif(lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH + color, data = wine_dat)) # or the transformed one
+vif(lm(quality ~ alcohol + sulphates + residual.sugar + pH + color, 
+       data = wine_dat)) # Might be this one; the base model doesn't have a color term
+vif(lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH + color, 
+       data = wine_dat)) # or the transformed one
 ```
 
 
-
 ## Influential Statistics
-
 ```{r Outliers with Summary Stats, cache=TRUE}
 #figuring out outliers based on scatterplot matrix
 mean_values <- wine_dat %>%
-  summarize(across(c(alcohol, sulphates, pH, residual.sugar, citric.acid, fixed.acidity), mean, na.rm = TRUE))
+  summarize(across(c(alcohol, sulphates, pH, residual.sugar, citric.acid, fixed.acidity), 
+                   mean, na.rm = TRUE))
 mean_values
 
 row_num <- 4381
-case_values <- wine_dat[row_num, c("alcohol", "sulphates", "pH", "residual.sugar", "citric.acid", "fixed.acidity")]
+case_values <- wine_dat[row_num, 
+                        c("alcohol", "sulphates", "pH", "residual.sugar",
+                          "citric.acid", "fixed.acidity")]
 case_values
 #This case has a very large residual sugar
 ```
@@ -305,7 +313,8 @@ high_CD
 ## Reg on no outlier
 wine_dat_no_outliers <- wine_dat %>%
   filter(residual.sugar != 65.8)
-winenooutlierslm <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat_no_outliers)
+winenooutlierslm <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, 
+                       data = wine_dat_no_outliers)
 summary(winenooutlierslm) #doesn't change conclusion
 
 # visuals of (not) removing the outlier
@@ -331,7 +340,9 @@ plot_grid2
 ```{r Backward and Forward Selection, cache=TRUE, results='hide', message=FALSE, warning=FALSE}
 set.seed(67393937)
 
-upper_model <- lm(quality ~ (pH + alcohol + log(residual.sugar) + color + log(sulphates) + fixed.acidity + volatile.acidity + citric.acid + chlorides + free.sulfur.dioxide + total.sulfur.dioxide + density)^2,
+upper_model <- lm(quality ~ (pH + alcohol + log(residual.sugar) + color + log(sulphates) + 
+                               fixed.acidity + volatile.acidity + citric.acid + chlorides + 
+                               free.sulfur.dioxide + total.sulfur.dioxide + density)^2,
                  data = wine_dat)
 lower_model <- lm(quality ~ 1, data = wine_dat)
 
