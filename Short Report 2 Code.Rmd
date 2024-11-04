@@ -364,7 +364,7 @@ ph_se <- sqrt(ph_cov[[1, 1]] + ph_cov[[2, 2]] + 2 * ph_cov[[1, 2]])
 test_stat <- whtPH/ph_se
 2*pt(test_stat, df = 6497 - 7, lower.tail = F)
 
-wht_ci <- whtPH + c(-1, 1)*qt(0.975, df = 6497 - 7, )*ph_se
+wht_ci <- whtPH + c(-1, 1)*qt(0.975, df = 6497 - 7)*ph_se
 
 wine_lminteraction_tran$coefficients[3] * log(2)
 wine_lminteraction_tran$coefficients[4] * log(2)
