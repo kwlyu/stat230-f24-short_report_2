@@ -257,7 +257,22 @@ resid_panel(wine_lminteraction, plots = c("hist", "qq", "resid"), smoother = T)
 resid_panel(wine_lminteraction, plots = "resid", smoother = TRUE)
 resid_xpanel(wine_lminteraction, smoother = TRUE)
 
-
+wine_lm_aug <- augment(wine_lminteraction, newdata = wine_dat)
+wine_lm_res2 <- ggplot(wine_lm_aug, aes(x = sulphates, y = .resid)) + 
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+  geom_smooth(method = "loess", color = "red") +
+  labs(x = "Sulphates", y = "residuals")
+wine_lm_res3 <- ggplot(wine_lm_aug, aes(x = residual.sugar, y = .resid)) + 
+  geom_point(alpha = 0.3) +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+  geom_smooth(method = "loess", color = "red") +
+  labs(x = "Residual Sugar", y = "residuals")
+combined_plot <- (wine_lm_res2 | wine_lm_res3) 
+  combined_plot + 
+    plot_layout(guides = 'collect') + 
+    plot_annotation(title = "Selected Residual Plot of Wine Quality MLR")
+combined_plot
 # 
 create_res_plot <- function(data) {
   # augment data for plotting
@@ -332,5 +347,23 @@ wine_lminteraction_tran <- lm(quality ~ alcohol + log(sulphates) + log(residual.
 summary(wine_lminteraction_tran)
 AIC(wine_lminteraction_tran)
 create_res_plot(wine_lminteraction_tran)
+
+confint(wine_lminteraction_tran)
+confint(wine_lminteraction_tran)*log(2)
+
+# linear comb for white wine ph
+wine_lminteraction_tran$coefficients[5] -> redPH
+wine_lminteraction_tran$coefficients[7] -> whtPH_int
+
+whtPH <- (redPH + whtPH_int)[[1]]
+
+vcov(wine_lminteraction_tran)[c(5, 7), c(5, 7)] -> ph_cov
+
+ph_se <- sqrt(ph_cov[[1, 1]] + ph_cov[[2, 2]] + 2 * ph_cov[[1, 2]])
+
+test_stat <- whtPH/ph_se
+2*pt(test_stat, df = 6497 - 7, lower.tail = F)
+
+wht_ci <- whtPH + c(-1, 1)*qt(0.975, df = 6497 - 7, )*ph_se
 ```
 
