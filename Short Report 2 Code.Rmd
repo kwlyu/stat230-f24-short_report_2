@@ -175,7 +175,7 @@ test_stat <- whtPH/ph_se
 ```{r}
 #checking for influential observations
 wine_datrow <- wine_dat %>% mutate(case = row_number())
-AUGwine_lminteraction <- augment(wine_lminteraction, data = wine_datrow)
+AUGwine_lminteraction <- augment(wine_lminteraction_tran, data = wine_datrow)
 
 
 ggplot(data = AUGwine_lminteraction, aes(x = case, y = .cooksd)) + 
