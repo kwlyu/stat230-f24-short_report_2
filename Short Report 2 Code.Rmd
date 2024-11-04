@@ -9,6 +9,7 @@ knitr::opts_chunk$set(echo = TRUE, cache = T)
 library(tidyverse)
 library(ggplot2)
 library(GGally)
+library(ggResidpanel)
 library(broom)
 library(patchwork)
 library(purrr)
@@ -255,6 +256,76 @@ resid_panel(wine_lminteraction, plots = c("hist", "qq", "resid"), smoother = T)
 resid_panel(wine_lminteraction, plots = "resid", smoother = TRUE)
 resid_xpanel(wine_lminteraction, smoother = TRUE)
 
+
+# 
+create_res_plot <- function(data) {
+  # augment data for plotting
+  wine_lm_aug <- augment(data, newdata = wine_dat)
+  if (identical(data, wine_lminteraction_tran)) {
+    wine_lm_aug$var_sul <- log(wine_lm_aug$sulphates)
+    wine_lm_aug$var_sug <- log(wine_lm_aug$residual.sugar)
+  } else {
+    wine_lm_aug$var_sul <- wine_lm_aug$sulphates
+    wine_lm_aug$var_sug <- wine_lm_aug$residual.sugar
+  }
+  # residual plot
+  wine_lm_res1 <- ggplot(wine_lm_aug, aes(x = alcohol, y = .resid)) + 
+    geom_point(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    geom_smooth(method = "loess", color = "red") +
+    labs(x = "Alcohol Content", y = "residuals")
+  
+  wine_lm_res2 <- ggplot(wine_lm_aug, aes(x = var_sul, y = .resid)) + 
+    geom_point(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    geom_smooth(method = "loess", color = "red") +
+    labs(x = "Log(Sulphates)", y = "residuals")
+  
+  wine_lm_res3 <- ggplot(wine_lm_aug, aes(x = var_sug, y = .resid)) + 
+    geom_point(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    geom_smooth(method = "loess", color = "red") +
+    labs(x = "Log(Residual Sugar)", y = "residuals")
+  
+  wine_lm_res4 <- ggplot(wine_lm_aug, aes(x = pH, y = .resid)) + 
+    geom_point(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    geom_smooth(method = "loess", color = "red") +
+    labs(x = "pH Levels", y = "residuals")
+  
+  wine_lm_res5 <- ggplot(wine_lm_aug, aes(x = color, y = .resid)) + 
+    geom_boxplot() +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    labs(x = "Wine Color", y = "residuals")
+  
+  wine_lm_res6 <- ggplot(wine_lm_aug, aes(x = .fitted, y = .resid)) + 
+    geom_point(alpha = 0.3) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "blue") + 
+    geom_smooth(method = "loess", color = "red") + 
+    labs(x = "Fitted Values", y = "residuals")
+  
+  # normal qq plot
+  wine_lm_qq <- ggplot(wine_lm_aug, aes(sample = .resid))+
+  geom_qq() +
+  geom_qq_line(color = "blue") +
+  labs(y = "Sample Quantiles", x = "Normal Quantiles")
+  
+  combined_plot <- (wine_lm_res1 | wine_lm_res2 | wine_lm_res3) / (wine_lm_res4 | wine_lm_res5 | wine_lm_res6) / wine_lm_qq
+  combined_plot + 
+    plot_layout(guides = 'collect') + 
+    plot_annotation(title = "Residual Plot and Normal Q-Q Plot of Wine Quality MLR")
+}
+
+create_res_plot(wine_lminteraction)
 ```
 
+
+```{r}
+# transformed model
+
+wine_lminteraction_tran <- lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH*color, data = wine_dat)
+summary(wine_lminteraction_tran)
+
+create_res_plot(wine_lminteraction_tran)
+```
 
