@@ -55,6 +55,24 @@ ggplot(wine_dat, aes(x = quality)) +
 ```
 
 ```{r}
+#scatterplots for predictors vs wine quality
+create_plot <- function(var_name) {
+  ggplot(data = wine_dat, 
+         aes_string(x = var_name, y = "quality")) +
+    geom_point(alpha = 0.1) +
+    geom_smooth(method = "lm", se = FALSE) + 
+    labs(title = paste("Quality vs", var_name))
+}
+
+variable_names <- c("alcohol", "sulphates", "pH", "residual.sugar")
+plot_list <- map(variable_names, create_plot)
+
+plot_grid <- wrap_plots(plot_list, ncol = 2)
+plot_grid
+```
+
+
+```{r}
 #correlation matrix
 library(corrplot)
 
@@ -111,7 +129,6 @@ case_values
 ```
 
 ```{r}
-
 #making an interaction model
 interactionmodel <- lm(quality ~ alcohol + sulphates + residual.sugar + pH*color, data = wine_dat)
 summary(interactionmodel)
@@ -214,7 +231,7 @@ high_CD
 ```
 
 ```{r}
-#model comparison
+#model comparison: interaction vs base, untransformed
 anova(wine_lmbase, wine_lminteraction)
 ```
 
@@ -350,7 +367,10 @@ create_res_plot(wine_lminteraction_tran)
 
 confint(wine_lminteraction_tran)
 confint(wine_lminteraction_tran)*log(2)
+```
 
+
+```{r}
 # linear comb for white wine ph
 wine_lminteraction_tran$coefficients[5] -> redPH
 wine_lminteraction_tran$coefficients[7] -> whtPH_int
@@ -368,5 +388,13 @@ wht_ci <- whtPH + c(-1, 1)*qt(0.975, df = 6497 - 7)*ph_se
 
 wine_lminteraction_tran$coefficients[3] * log(2)
 wine_lminteraction_tran$coefficients[4] * log(2)
+```
+
+```{r}
+#model comparison with transformed model
+wine_lmbasetran <- lm(quality ~ alcohol + log(sulphates) + log(residual.sugar) + pH, data = wine_dat)
+anova( wine_lmbasetran, wine_lminteraction_tran)
+summary(wine_lminteraction_tran)
+AIC(wine_lminteraction_tran)
 ```
 
