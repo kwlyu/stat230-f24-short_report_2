@@ -42,7 +42,7 @@ ggplot(wine_dat, aes(x = quality)) +
 create_plot <- function(var_name) {
   ggplot(data = wine_dat, 
          aes_string(x = var_name, y = "quality", color = "color")) +
-    geom_point(alpha = 0.1) +
+    geom_point(alpha = 0.1, position = position_jitter()) +
     geom_smooth(method = "lm", se = FALSE) + 
     labs(title = paste("Quality vs", var_name))
 }
@@ -52,6 +52,13 @@ plot_list <- map(variable_names, create_plot)
 
 plot_grid <- wrap_plots(plot_list, ncol = 2)
 plot_grid
+
+
+## scat plot for report
+ggplot(data = wine_dat, aes(x = pH, y = quality, color = color)) +
+  geom_point(alpha = 0.3, position = position_jitter()) + 
+  geom_smooth(method = "lm", se = F) + 
+  labs(title = "Quality vs pH, by Color", x = "pH", y = "Quality")
 
 
 ## correlation matrix
