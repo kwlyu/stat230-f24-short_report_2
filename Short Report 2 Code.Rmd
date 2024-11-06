@@ -19,6 +19,24 @@ library(MASS)
 ```
 
 ## Data Wrangling
+```{r}
+#Variable Distributions through Histograms
+hist(wine_dat$residual.sugar, main = "Distribution of Residual Sugar", xlab = "Residual Sugar")
+hist(wine_dat$alcohol, main = "Distribution of Alcohol", xlab = "Alcohol")
+hist(wine_dat$pH, main = "Distribution of pH", xlab = "pH")
+hist(wine_dat$sulphates, main = "Distribution of Sulphates", xlab = "Sulphates")
+```
+```{r}
+#Variable Distributions through Boxplots
+boxplot(wine_dat$residual.sugar, main = "Residual Sugar", ylab = "Residual Sugar")
+boxplot(wine_dat$alcohol, main = "Alcohol", ylab = "Alcohol")
+boxplot(wine_dat$pH, main = "pH", ylab = "pH")
+boxplot(wine_dat$sulphates, main = "Sulphates", ylab = "Sulphates")
+
+```
+
+
+
 ```{r Read and Scat. Mtrx, cache=TRUE}
 ## Data Wrangling & Scatterplot Matrix
 wine_dat <- read.csv("https://www.math.carleton.edu/ckelling/data/wine_project.csv")
