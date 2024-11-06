@@ -199,19 +199,15 @@ confint(wine_lm_interaction_tran)*log(2) # un-transforming logged
 wine_lm_base_tran <- lm(quality ~ alcohol + log(sulphates) + 
                           log(residual.sugar) + pH, data = wine_dat)
 
-## interaction vs base, untransformed
-anova(wine_lm_base, wine_lm_interaction)
-
-## interaction vs base, transformed
-anova(wine_lm_base, wine_lm_interaction_tran)
+summary(wine_lm_base_tran)
 
 #model comparison with transformed model
 anova(wine_lm_base_tran, wine_lm_interaction_tran)
 
 ## AIC's
-AIC(wine_lm_base)
 AIC(wine_lm_interaction)
 AIC(wine_lm_interaction_tran)
+AIC(wine_lm_base_tran)
 ```
 
 
